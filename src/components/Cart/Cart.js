@@ -6,6 +6,10 @@ import CartItem from './CartItem';
 
 const Cart = (props) => {
   const cartItems = useSelector((state) => state.cartItems);
+  const totalPrice = cartItems.reduce(
+    (total, item) => (total += item.quantity * item.price),
+    0
+  );
 
   return (
     <Card className={classes.cart}>
@@ -13,15 +17,19 @@ const Cart = (props) => {
         <>
           <h2>Your Shopping Cart</h2>
           <ul>
-            <CartItem
-              item={{
-                title: cartItems[0].title,
-                quantity: cartItems[0].quantity,
-                total: cartItems[0].quantity * cartItems[0].price,
-                price: cartItems[0].price,
-              }}
-            />
+            {cartItems.map((item) => (
+              <CartItem
+                key={item.id}
+                item={{
+                  title: item.title,
+                  quantity: item.quantity,
+                  total: item.quantity * item.price,
+                  price: item.price,
+                }}
+              />
+            ))}
           </ul>
+          <h2>Total Price: ${totalPrice.toFixed(2)}</h2>
         </>
       )}
     </Card>
