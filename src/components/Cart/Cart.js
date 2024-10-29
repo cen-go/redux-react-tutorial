@@ -9,7 +9,7 @@ const Cart = (props) => {
   const totalPrice = cartItems.reduce(
     (total, item) => (total += item.quantity * item.price),
     0
-  );
+  );  
 
   return (
     <Card className={classes.cart}>

@@ -3,6 +3,7 @@ import { createSlice, configureStore } from "@reduxjs/toolkit";
 const initialCartState = {
   isCartShowing: false,
   cartItems: [],
+  notification: null,
 };
 
 const cartSlice = createSlice({
@@ -37,6 +38,13 @@ const cartSlice = createSlice({
         state.isCartShowing = false;
       }
     },
+    showNotification(state, action) {
+      state.notification = {
+        status: action.payload.status,
+        title: action.payload.title,
+        message: action.payload.message,
+      };
+    },
   }
 })
 
@@ -45,5 +53,47 @@ const store = configureStore({
 });
 
 export const cartActions = cartSlice.actions;
+
+export const sendCartData = (cart) => {
+  return async (dispatch) => {
+    dispatch(
+      cartActions.showNotification({
+        status: "pending",
+        title: "Sending...",
+        message: "Sending cart data.",
+      })
+    );
+    
+    try {
+      const response = await fetch(
+        "https://udemy-react-9014b-default-rtdb.europe-west1.firebasedatabase.app/redux-cart.json",
+        {
+          method: "PUT",
+          body: JSON.stringify(cart),
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Sending cart data failed");
+      }
+      dispatch(
+        cartActions.showNotification({
+          status: "success",
+          title: "Success!",
+          message: "Cart data is sent successfully",
+        })
+      );
+    } catch (error) {
+      dispatch(
+        cartActions.showNotification({
+          status: "error",
+          title: "Error!",
+          message: "sending cart data failed!",
+        })
+      );
+    }
+  };
+};
 
 export default store
